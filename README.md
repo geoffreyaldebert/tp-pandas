@@ -51,7 +51,7 @@ le résultat de la lecture de ce fichier est stocké dans la variable df. Cette 
 Par défaut, pandas essaie de lire le fichier avec un séparateur de type ```,``` "virgule". Mais certaines fois, le fichier a un autre séparateur, souvent ```;``` "point-virgule". Si c'est le cas (ce qui implique de toujours jeter un coup d'oeil au fichier avant de la manipuler avec pandas), on peut rajouter l'option ```sep``` au moment de la lecture du fichier : 
 
 ```
-df = pd.read_csv("CHEMIN/VERS/MON/FICHIER/monfichier.csv", sep=";")
+df = pd.read_csv("CHEMIN/VERS/MON/FICHIER/monfichier.csv", dtype=str, sep=";")
 ```
 
 #### Afficher le dataframe
@@ -134,7 +134,7 @@ df = df.drop([df.index[12]) #On enlève ici le row en 13e position
 #### Enlever des colonnes
 
 ```
-df.drop(columns=['col1','col2')
+df.drop(columns=['col1','col2'])
 ```
 
 #### Copier un dataframe 
@@ -160,9 +160,8 @@ df['NOUVELLE_COLONNE'] = df['NOM_COLONNE1'] * 2 # Multiplie par 2 la valeur de l
 
 #### Cast une colonne
 
-Les types des colonnes sont automatiquement détectés par pandas. Or il arrive que pandas ce trompe. On doit donc caster la colonne avec le type correct. Par exemple :
+Les types des colonnes sont automatiquement détectés par pandas. Or il arrive que pandas se trompe. On doit donc caster la colonne avec le type correct. Par exemple :
 
-| -- | -- |
 | prenom | age |
 | -- | -- |
 | Gérard | 57 |
@@ -178,13 +177,7 @@ df['age'] = pd.to_numeric(df['total_06'], errors='coerce')
 
 Le ```errors='coerce'``` indique à Pandas de mettre la valeur à nulle si il n'arrive pas à la caster
 
-Autre solution : 
-
-```
-df['age'] = df['age].astype(int)
-```
-
-Mais cette solution peut générer des erreurs.
+C'est pour cela qu'une bonne pratique consiste à charger le dataframe avec la propriété ```dtype=str``` vu précédemment avec la fonction ```read_csv()```. En faisant cela, on charge toutes les données comme des strings et on pourra changer leur type plus tard dans les traitements.
 
 #### Trier un dataframe
 
@@ -193,7 +186,7 @@ df.sort_values(by=['col1']) #Permet de trier en ordre croissant une colonne
 df.sort_values(by='col1', ascending=False) #Permet de trier en ordre décroissant une colonne
 ```
 
-Attention, cette opération est effectuée ci-dessus uniquement à la volée et n'est pas enregistrée. Si on veut trier un dataframe et le garder comme ça pour manipulation ultérieures, il faut affecter :
+Attention, cette opération est effectuée ci-dessus uniquement à la volée et n'est pas enregistrée. Si on veut trier un dataframe et le garder comme ça pour manipulation ultérieures, il faut l'affecter à une variable (ça peut être le dataframe lui-même) : 
 
 ```
 df = df.sort_values(by=['col1']) #Permet de trier en ordre croissant une colonne
@@ -216,7 +209,7 @@ On peut avoir plusieurs conditions :
 df_sup_20_inf_50 = df[(df['age] > 20) & (df['age] < 50)]
 ```
 
-#### Ecarter ou garder les valeurs nuls d'une colonne
+#### Ecarter ou garder les valeurs nulles d'une colonne
 
 ```
 df = df[df['col'].notna()] #Enlève toutes les lignes ou la col1 est nulle
@@ -250,7 +243,6 @@ df_enrichi = pd.merge(df1,df2,on="code_departement",how="left")
 Le group by permet de regrouper les données d'un dataframe à partir d'une ou plusieurs colonnes :
 
 
-| -- | -- | --L
 | prenom | age | dep |
 | -- | -- | --|
 | Gérard | 57 | 75 |
@@ -264,3 +256,8 @@ df_final = df.groupby(['dep'], as_index=False).sum() # On obtient la somme des a
 ```
 
 
+#### Enregistrer un dataframe dans un csv
+
+```
+df.to_csv("NOUVEAUNOM.csv",index=False)
+```
